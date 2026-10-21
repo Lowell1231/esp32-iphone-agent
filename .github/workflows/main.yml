@@ -1,0 +1,21 @@
+name: Build iOS IPA
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build App
+        run: |
+          cd ios
+          xcodebuild -project IPhoneAgent.xcodeproj -scheme IPhoneAgent -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO build
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r ios/build/Release-iphoneos/IPhoneAgent.app Payload/
+          zip -r IPhoneAgent.ipa Payload
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IPhoneAgent-IPA
+          path: IPhoneAgent.ipa
